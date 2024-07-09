@@ -10,7 +10,7 @@ namespace Arkanoid
 		virtual ~Entity();
 
 		void Destroy();
-		bool IsPendingDestroy() const;
+		bool IsPendingToDestroy() const;
 	private:
 		bool m_bIsPendingToDestroy;
 	};

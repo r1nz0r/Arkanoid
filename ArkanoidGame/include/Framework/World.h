@@ -5,8 +5,6 @@
 namespace Arkanoid
 {
 	class Actor;
-	class Ball;
-	class Paddle;
 	class World : public Entity
 	{
 	public:
@@ -14,24 +12,21 @@ namespace Arkanoid
 		~World() = default;
 
 		virtual void BeginPlay();
-		virtual void Tick(float deltaTime);
-		virtual void Render(sf::RenderWindow& window) const;
+		void TickInternal(float deltaTime);
+		void Render(sf::RenderWindow& window) const;
 		// We need to remove all actors marked for deletion in previous frame.
 		void Clean();
-		void HandleInput();
-		std::weak_ptr<Paddle> GetPaddle() const { return m_paddle; }
-		inline sf::Vector2u GetWindowSize() const { return m_owner->GetWindowSize(); };
 
 		template<class ActorType, typename... Args>
 		std::weak_ptr<ActorType> SpawnActor(Args... args);
 
+	protected:
+		virtual void Tick(float deltaTime);
+		Application* m_owner;
+
 	private:
 		std::vector<std::shared_ptr<Actor>> m_actors; // All alive actors in world
 		std::vector<std::shared_ptr<Actor>> m_pendingActors; // Actors to be spawned in next tick
-		std::weak_ptr<Ball> m_ball;
-		std::weak_ptr<Paddle> m_paddle;
-		Application* m_owner;
-
 	};
 
 	template<class ActorType, typename ...Args>

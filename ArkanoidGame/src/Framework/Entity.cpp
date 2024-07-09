@@ -16,7 +16,7 @@ namespace Arkanoid
 		m_bIsPendingToDestroy = true;
 	}
 
-	bool Entity::IsPendingDestroy() const
+	bool Entity::IsPendingToDestroy() const
 	{
 		return m_bIsPendingToDestroy;
 	}

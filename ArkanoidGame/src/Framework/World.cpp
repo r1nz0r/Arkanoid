@@ -1,8 +1,6 @@
 #include "Framework/World.h"
 #include "Framework/Actor.h"
 #include "Framework/Core.h"
-#include "Game/Paddle.h"
-#include "Game/Ball.h"
 
 namespace Arkanoid
 {
@@ -14,9 +12,14 @@ namespace Arkanoid
 	}
 	
 	void World::BeginPlay()
+	{}
+
+	void World::TickInternal(float deltaTime)
 	{
-		m_paddle = SpawnActor<Paddle>();
-		m_ball = SpawnActor<Ball>();
+		if (IsPendingToDestroy())
+			return;
+
+		Tick(deltaTime);
 	}
 
 	void World::Tick(float deltaTime)
@@ -31,8 +34,6 @@ namespace Arkanoid
 
 		for (auto iter = m_actors.begin(); iter != m_actors.end(); ++iter)
 			iter->get()->TickInternal(deltaTime);
-
-		HandleInput();
 	}
 
 	void World::Render(sf::RenderWindow& window) const
@@ -47,17 +48,10 @@ namespace Arkanoid
 	{
 		for (auto iter = m_actors.begin(); iter != m_actors.end();)
 		{			
-			if (iter->get()->IsPendingDestroy())
+			if (iter->get()->IsPendingToDestroy())
 				iter = m_actors.erase(iter);
 			else
 				++iter;
 		}
-	}
-
-	void World::HandleInput()
-	{
-		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space))
-			if (!m_ball.expired())
-				m_ball.lock()->Detach();
-	}
+	}	
 }

@@ -22,7 +22,7 @@ namespace Arkanoid
 
 	void Actor::TickInternal(float deltaTime)
 	{
-		if (IsPendingDestroy())
+		if (IsPendingToDestroy())
 			return;
 
 		Tick(deltaTime);		
@@ -40,7 +40,7 @@ namespace Arkanoid
 
 	void Actor::Render(sf::RenderWindow& window) const
 	{
-		if (IsPendingDestroy())
+		if (IsPendingToDestroy())
 			return;
 
 		window.draw(*m_shape);

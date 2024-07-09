@@ -1,6 +1,6 @@
 #include "Game/Ball.h"
 #include "Game/GameSettings.h"
-#include "Framework/World.h"
+#include "Game/GameLevel.h"
 #include "Game/Paddle.h"
 #include "Framework/MathUtils.h"
 
@@ -23,7 +23,7 @@ namespace Arkanoid
 	{
 		if (IsAttachedToPaddle())
 		{
-			if (auto paddle = m_owner->GetPaddle().lock())
+			if (auto paddle = static_cast<GameLevel*>(m_owner)->GetPaddle().lock())
 				SetPosition(paddle->GetPosition() - sf::Vector2f(0.f, PADDLE_HEIGHT / 2 + BALL_SIZE));
 
 			return;
@@ -60,7 +60,7 @@ namespace Arkanoid
 
 	void Ball::DoCollisionTests()
 	{
-		std::weak_ptr<Paddle> paddle = m_owner->GetPaddle();
+		std::weak_ptr<Paddle> paddle = static_cast<GameLevel*>(m_owner)->GetPaddle();
 
 		if (paddle.expired())
 			return;

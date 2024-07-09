@@ -1,8 +1,6 @@
 #include "Framework/Application.h"
 #include "Framework/Core.h"
-#include "Framework/World.h"
-#include "Game/Paddle.h"
-#include "Game/Ball.h"
+#include "Game/GameLevel.h"
 #include "Game/GameSettings.h"
 
 namespace Arkanoid
@@ -14,7 +12,7 @@ namespace Arkanoid
 		, m_cleanClock()
 		, m_gameClock()		
 		, m_cleanInterval(2.f)
-		, m_world(std::make_unique<World>(this))
+		, m_world(std::make_unique<GameLevel>(this))
 	{}
 
 	Application::~Application()
@@ -54,7 +52,7 @@ namespace Arkanoid
 	void Application::Tick(float deltaTime)
 	{
 		if (m_world)
-			m_world->Tick(deltaTime);
+			m_world->TickInternal(deltaTime);
 
 		if (m_cleanClock.getElapsedTime().asSeconds() >= m_cleanInterval)
 		{

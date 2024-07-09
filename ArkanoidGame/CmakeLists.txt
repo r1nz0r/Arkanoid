@@ -2,8 +2,7 @@
 set(GAME_SOURCES
 
     src/EntryPoint.cpp
-    include/EntryPoint.h
-
+    
     src/Framework/Application.cpp
     include/Framework/Application.h
 

@@ -2,7 +2,7 @@
 set(GAME_SOURCES
 
     src/EntryPoint.cpp
-    
+
     src/Framework/Application.cpp
     include/Framework/Application.h
 
@@ -24,6 +24,9 @@ set(GAME_SOURCES
     include/Framework/Collider.h
     src/Framework/Collider.cpp
 
+    include/Framework/PhysicsActor.h
+    src/Framework/PhysicsActor.cpp
+
     include/Game/Ball.h
     src/Game/Ball.cpp
 
@@ -39,8 +42,12 @@ set(GAME_SOURCES
     src/Game/GameLevel.cpp
 )
 
+FILE(GLOB_RECURSE headers "include/*.h")
+FILE(GLOB_RECURSE sources "src/*.cpp")
+
 # Create static library for Engine
 add_executable(${ARKANOID_GAME_TARGET_NAME} ${GAME_SOURCES})
+source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR}  FILES ${sources} ${headers})
 
 # Set include directories for Engine
 target_include_directories(${ARKANOID_GAME_TARGET_NAME} PUBLIC 

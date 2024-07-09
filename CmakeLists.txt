@@ -14,8 +14,7 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 option(BUILD_SHARED_LIBS "Build shared libraries" OFF)
 
 #Internal variables
-set(ARKANOID_ENGINE_TARGET_NAME ArkanoidEngine)
 set(ARKANOID_GAME_TARGET_NAME ArkanoidGame)
-# Add engine and game Cmake files
-add_subdirectory(${ARKANOID_ENGINE_TARGET_NAME})
-#add_subdirectory(${ARKANOID_GAME_TARGET_NAME})
+
+# Add game Cmake files
+add_subdirectory(${ARKANOID_GAME_TARGET_NAME})

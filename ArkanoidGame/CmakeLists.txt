@@ -1,0 +1,77 @@
+# Add source and header files of engine here
+set(GAME_SOURCES
+
+    src/EntryPoint.cpp
+    include/EntryPoint.h
+
+    src/Framework/Application.cpp
+    include/Framework/Application.h
+
+    src/Framework/Entity.cpp
+    include/Framework/Entity.h
+
+    include/Framework/Core.h
+    include/Framework/Noncopyable.h
+
+    include/Framework/MathUtils.h
+    src/Framework/MathUtils.cpp
+
+    include/Framework/World.h
+    src/Framework/World.cpp
+
+    include/Framework/Actor.h
+    src/Framework/Actor.cpp
+
+    include/Framework/Collider.h
+    src/Framework/Collider.cpp
+
+    include/Game/Ball.h
+    src/Game/Ball.cpp
+
+    include/Game/Paddle.h
+    src/Game/Paddle.cpp
+
+    include/Game/Block.h
+    src/Game/Block.cpp
+
+    include/Game/GameSettings.h
+
+    include/Game/GameLevel.h
+    src/Game/GameLevel.cpp
+)
+
+# Create static library for Engine
+add_executable(${ARKANOID_GAME_TARGET_NAME} ${GAME_SOURCES})
+
+# Set include directories for Engine
+target_include_directories(${ARKANOID_GAME_TARGET_NAME} PUBLIC 
+    ${CMAKE_CURRENT_SOURCE_DIR}/include
+)
+
+set(SFML_LIB_NAME SFML)
+
+#Using fetch for download SFML
+include(FetchContent)
+FetchContent_Declare(
+    ${SFML_LIB_NAME}
+    GIT_REPOSITORY https://github.com/SFML/SFML
+    GIT_TAG 2.6.1
+    GIT_SHALLOW FALSE
+)
+
+## If you want to link SFML statically
+set(SFML_STATIC_LIBRARIES TRUE)
+
+#Load lib
+FetchContent_MakeAvailable(${SFML_LIB_NAME})
+
+target_link_libraries(${ARKANOID_GAME_TARGET_NAME} PRIVATE sfml-graphics)
+target_compile_features(${ARKANOID_GAME_TARGET_NAME} PRIVATE cxx_std_17)
+
+if(WIN32)
+    add_custom_command(
+        TARGET ${ARKANOID_GAME_TARGET_NAME}
+        COMMENT "Copy OpenAL DLL"
+        PRE_BUILD COMMAND ${CMAKE_COMMAND} -E copy ${SFML_SOURCE_DIR}/extlibs/bin/$<IF:$<EQUAL:${CMAKE_SIZEOF_VOID_P},8>,x64,x86>/openal32.dll $<TARGET_FILE_DIR:${ARKANOID_GAME_TARGET_NAME}>
+        VERBATIM)
+endif()

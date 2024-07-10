@@ -1,6 +1,4 @@
 # Add source and header files of engine here
-
-
 FILE(GLOB_RECURSE headers "include/*.h")
 FILE(GLOB_RECURSE sources "src/*.cpp")
 

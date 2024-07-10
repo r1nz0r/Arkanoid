@@ -1,11 +1,11 @@
 #pragma once
-#include "Framework/Actor.h"
-#include "Framework/Collider.h"
+#include "Framework/PhysicsActor.h"
 
 namespace Arkanoid
 {
 	class World;
-	class Ball : public Actor
+	class Rectangle;
+	class Ball : public PhysicsActor
 	{
 	public:
 		enum class BounceDirectionBitMask : uint8_t
@@ -25,9 +25,7 @@ namespace Arkanoid
 		~Ball() = default;
 		void Tick(float deltaTime) override;
 		void BeginPlay() override;
-		void SetVelocity(const sf::Vector2f& velocity);
-		void SetPosition(const sf::Vector2f& newPosition) override;
-		void AddPositionOffset(const sf::Vector2f& offset) override;		
+		void SetVelocity(const sf::Vector2f& velocity);	
 		void Detach();
 		bool IsAttachedToPaddle() const { return m_isAttached; }
 
@@ -36,6 +34,7 @@ namespace Arkanoid
 		void SetBounceDirection(BounceDirectionBitMask flag);
 		void UpdateBounceDirection();
 		void DoCollisionTests();
+		virtual void OnCollisionEnter(const Collider& other) override;
 		void OnPaddleCollision(const Rectangle& other);
 		void OnVerticalBoundsCollision();
 		void OnHorizontalBoundsCollision();
@@ -46,6 +45,5 @@ namespace Arkanoid
 		float m_speed;
 		uint8_t m_bounceDirection;
 		bool m_isAttached;
-		Circle m_collider;
 	};
 }

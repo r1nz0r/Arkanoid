@@ -3,16 +3,16 @@
 #include "Game/GameLevel.h"
 #include "Game/Paddle.h"
 #include "Framework/MathUtils.h"
+#include "Framework/Collider.h"
 
 namespace Arkanoid
 {
 	Ball::Ball(World* owner)
-		: Actor(owner)
+		: PhysicsActor(owner, new Circle({0.f, 0.f}, BALL_SIZE))
 		, m_speed(BALL_INITIAL_SPEED)
 		, m_velocity(0.f, 0.f)
 		, m_bounceDirection(0)
 		, m_isAttached(true)
-		, m_collider({ 0.f, 0.f }, BALL_SIZE)
 	{
 		m_shape.reset(new sf::CircleShape(BALL_SIZE, 30u));
 		m_shape->setFillColor(sf::Color::Green);
@@ -25,9 +25,11 @@ namespace Arkanoid
 		{
 			if (auto paddle = static_cast<GameLevel*>(m_owner)->GetPaddle().lock())
 				SetPosition(paddle->GetPosition() - sf::Vector2f(0.f, PADDLE_HEIGHT / 2 + BALL_SIZE));
-
+			
 			return;
 		}
+
+		LOG("Ball position y: %f\tCollider position y: %f", GetPosition().y, m_collider->GetPosition().y);
 
 		DoCollisionTests();
 		UpdateBounceDirection();
@@ -65,21 +67,24 @@ namespace Arkanoid
 		if (paddle.expired())
 			return;
 
-		auto paddleCollider = paddle.lock()->GetCollider();
-
-		if (Collider::CheckCollision(m_collider, paddleCollider))
-			OnPaddleCollision(paddleCollider);
+		if (CheckCollision(paddle.lock().get()))
+			OnPaddleCollision(*static_cast<Rectangle*>(paddle.lock()->GetCollider()));
 		else
 		{
-			if (Collider::CheckVerticalBoundsCollision(m_collider))
+			if (Collider::CheckVerticalBoundsCollision(m_collider.get()))
 			{
 				OnVerticalBoundsCollision();
 			}
-			else if (Collider::CheckHorizontalBoundsCollision(m_collider))
+			else if (Collider::CheckHorizontalBoundsCollision(m_collider.get()))
 			{
 				OnHorizontalBoundsCollision();
 			}
 		}
+	}
+
+	void Ball::OnCollisionEnter(const Collider& other)
+	{
+		//Empty
 	}
 
 	void Ball::Detach()
@@ -88,7 +93,7 @@ namespace Arkanoid
 			return;
 
 		m_isAttached = false;
-		SetVelocity({ 0.f, -1.0f });
+		SetVelocity({ 0.5f, -1.0f });
 	}
 
 	bool Ball::CheckBounceDirection(BounceDirectionBitMask flags)
@@ -111,18 +116,6 @@ namespace Arkanoid
 		m_velocity = velocity;
 	}
 
-	void Ball::SetPosition(const sf::Vector2f& newPosition)
-	{
-		Actor::SetPosition(newPosition);
-		m_collider.SetPosition(newPosition);
-	}
-
-	void Ball::AddPositionOffset(const sf::Vector2f& offset)
-	{
-		Actor::AddPositionOffset(offset);
-		m_collider.SetPosition(m_collider.GetPosition() + offset);
-	}
-
 	float Ball::GetPaddleBounceAngle(const Rectangle& paddle) const
 	{
 		const float normalizedHitPositionX = GetPaddleHitNormalizedPoint(paddle);
@@ -137,7 +130,7 @@ namespace Arkanoid
 
 	void Ball::OnVerticalBoundsCollision()
 	{
-		if (m_collider.GetPosition().y > SCREEN_HEIGHT / 2.f)
+		if (m_collider->GetPosition().y > SCREEN_HEIGHT / 2.f)
 			SetBounceDirection(BounceDirectionBitMask::Down);
 		else
 			SetBounceDirection(BounceDirectionBitMask::Up);
@@ -145,7 +138,7 @@ namespace Arkanoid
 
 	void Ball::OnHorizontalBoundsCollision()
 	{
-		if (m_collider.GetPosition().x > SCREEN_HEIGHT / 2.f)
+		if (m_collider->GetPosition().x > SCREEN_HEIGHT / 2.f)
 			SetBounceDirection(BounceDirectionBitMask::Left);
 		else
 			SetBounceDirection(BounceDirectionBitMask::Right);	

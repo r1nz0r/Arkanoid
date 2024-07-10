@@ -2,16 +2,16 @@
 #include "Game/GameSettings.h"
 #include "Framework/MathUtils.h"
 #include "Framework/Core.h"
+#include "Framework/Collider.h"
 
 namespace Arkanoid
 {
 	Paddle::Paddle(World* owner)
-		: Actor(owner)
+		: PhysicsActor(owner, new Rectangle({ 0.f, 0.f }, { PADDLE_WIDTH, PADDLE_HEIGHT }))
 		, m_direction(EMoveDirection::None)
 		, m_velocity()
 		, m_speed(PADDLE_SPEED)
 		, m_moveInput()
-		, m_collider({ 0.f, 0.f }, {PADDLE_WIDTH, PADDLE_HEIGHT})
 	{
 		m_shape.reset(new sf::RectangleShape({PADDLE_WIDTH, PADDLE_HEIGHT }));
 		CenterPivot();
@@ -36,19 +36,11 @@ namespace Arkanoid
 		m_velocity = velocity;
 	}
 
-	void Paddle::SetPosition(const sf::Vector2f& newPosition)
+	void Paddle::OnCollisionEnter(const Collider& other)
 	{
-		Actor::SetPosition(newPosition);
-		m_collider.SetPosition(GetPosition() - sf::Vector2f(PADDLE_WIDTH / 2, PADDLE_HEIGHT / 2));
-		LOG("Position paddle left corner: %f, Position collider left corner: %f", GetPosition().x, m_collider.GetPosition().x);
+		//Empty
 	}
-
-	void Paddle::AddPositionOffset(const sf::Vector2f & offset)
-	{
-		Actor::AddPositionOffset(offset);
-		m_collider.SetPosition(m_collider.GetPosition() + offset);
-	}
-
+	
 	void Paddle::HandleInput()
 	{
 		if (sf::Keyboard::isKeyPressed(sf::Keyboard::A))

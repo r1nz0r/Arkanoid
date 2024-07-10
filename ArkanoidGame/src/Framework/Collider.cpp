@@ -57,26 +57,60 @@ namespace Arkanoid
 		return false;
 	}
 
-	bool Collider::CheckHorizontalBoundsCollision(const Circle& object)
+	bool Collider::CheckHorizontalBoundsCollision(Collider* const object)
 	{
-		auto position = object.GetPosition();
-		auto radius = object.GetRadius();
+		Circle* circle = dynamic_cast<Circle*>(object);
 
-		if (position.x + radius >= SCREEN_WIDTH ||
-			position.x - radius <= 0)
-			return true;
+		if (circle)
+		{
+			auto position = circle->GetPosition();
+			auto radius = circle->GetRadius();
+
+			if (position.x + radius >= SCREEN_WIDTH ||
+				position.x - radius <= 0)
+				return true;
+		}
+		
+		Rectangle* rect = dynamic_cast<Rectangle*>(object);
+
+		if (rect)
+		{
+			auto position = rect->GetPosition();
+			auto size = rect->GetSize();
+
+			if (position.x + size.x >= SCREEN_WIDTH ||
+				position.x <= 0)
+				return true;
+		}
 
 		return false;
 	}
 
-	bool Collider::CheckVerticalBoundsCollision(const Circle& object)
+	bool Collider::CheckVerticalBoundsCollision(Collider* const object)
 	{
-		auto position = object.GetPosition();
-		auto radius = object.GetRadius();
+		Circle* circle = dynamic_cast<Circle*>(object);
 
-		if (position.y + radius >= SCREEN_HEIGHT ||
-			position.y - radius <= 0)
-			return true;
+		if (circle)
+		{
+			auto position = circle->GetPosition();
+			auto radius = circle->GetRadius();
+
+			if (position.y + radius >= SCREEN_HEIGHT ||
+				position.y - radius <= 0)
+				return true;
+		}
+
+		Rectangle* rect = dynamic_cast<Rectangle*>(object);
+
+		if (rect)
+		{
+			auto position = rect->GetPosition();
+			auto size = rect->GetSize();
+
+			if (position.y + size.x >= SCREEN_HEIGHT ||
+				position.y <= 0)
+				return true;
+		}
 
 		return false;
 	}

@@ -9,14 +9,15 @@ namespace Arkanoid
 	{
 	public:
 		Collider(const sf::Vector2f& position = {0.f,0.f});
+		virtual ~Collider() = default;
 		sf::Vector2f GetPosition() const { return m_position; }
 		void SetPosition(const sf::Vector2f position) { m_position = position; }
 
 		static bool CheckCollision(const Circle& object, const Rectangle& other);
 		static bool CheckBoundsCollision(const Circle& object);
 		static bool CheckBoundsCollision(const Rectangle& object);
-		static bool CheckHorizontalBoundsCollision(const Circle& object);
-		static bool CheckVerticalBoundsCollision(const Circle& object);
+		static bool CheckHorizontalBoundsCollision(Collider* const object);
+		static bool CheckVerticalBoundsCollision(Collider* const object);
 
 	private:
 		sf::Vector2f m_position;

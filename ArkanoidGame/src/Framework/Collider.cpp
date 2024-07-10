@@ -9,20 +9,24 @@ namespace Arkanoid
 		: m_position(position)
 	{}
 
-	bool Collider::CheckCollision(const Circle& lhs, const Rectangle& rhs)
+	bool Collider::CheckCollision(const Collider* lhs, const Collider* rhs)
 	{
-		auto rhsPosition = rhs.GetPosition();
-		auto lhsPosition = lhs.GetPosition();
+		if (!lhs || !rhs)
+			return false;	
 
-		const float rectangleX = std::max(
-			rhsPosition.x, std::min(lhsPosition.x, rhsPosition.x + rhs.GetSize().x));
-		const float dx = lhsPosition.x - rectangleX;
+		const Circle* col1 = dynamic_cast<const Circle*>(lhs);
+		const Rectangle* col2 = dynamic_cast<const Rectangle*>(rhs);
 
-		const float rectangleY = std::max(
-			rhsPosition.y, std::min(lhsPosition.y, rhsPosition.y + rhs.GetSize().y));
-		const float dy = lhsPosition.y - rectangleY;
+		if (col1 && col2)
+			return Collider::CheckCircleToRectCollision(*col1, *col2);
 
-		return (dx * dx + dy * dy) < (lhs.GetRadius() * lhs.GetRadius());
+		col1 = dynamic_cast<const Circle*>(lhs);
+		col2 = dynamic_cast<const Rectangle*>(rhs);
+
+		if (col1 && col2)
+			return Collider::CheckCircleToRectCollision(*col1, *col2);
+
+		return false;
 	}
 
 	bool Collider::CheckBoundsCollision(const Circle& object)
@@ -113,6 +117,22 @@ namespace Arkanoid
 		}
 
 		return false;
+	}
+
+	bool Collider::CheckCircleToRectCollision(const Circle& lhs, const Rectangle& rhs)
+	{
+		auto rhsPosition = rhs.GetPosition();
+		auto lhsPosition = lhs.GetPosition();
+
+		const float rectangleX = std::max(
+			rhsPosition.x, std::min(lhsPosition.x, rhsPosition.x + rhs.GetSize().x));
+		const float dx = lhsPosition.x - rectangleX;
+
+		const float rectangleY = std::max(
+			rhsPosition.y, std::min(lhsPosition.y, rhsPosition.y + rhs.GetSize().y));
+		const float dy = lhsPosition.y - rectangleY;
+
+		return (dx * dx + dy * dy) < (lhs.GetRadius() * lhs.GetRadius());
 	}
 
 	Circle::Circle(const sf::Vector2f& position, float radius)

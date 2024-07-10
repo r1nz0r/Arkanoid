@@ -19,23 +19,8 @@ namespace Arkanoid
 			return false;
 
 		auto otherCollider = other->GetCollider();
-
-		if (m_collider && otherCollider)
-		{
-			Circle* col1 = dynamic_cast<Circle*>(m_collider.get());
-			Rectangle* col2 = dynamic_cast<Rectangle*>(other->GetCollider());
-
-			if (col1 && col2)						
-				return Collider::CheckCollision(*col1, *col2);			
-
-			col1 = dynamic_cast<Circle*>(other->GetCollider());
-			col2 = dynamic_cast<Rectangle*>(m_collider.get());
-			
-			if (col1 && col2)						
-				return Collider::CheckCollision(*col1, *col2);			
-		}
-
-		return false;
+				
+		return Collider::CheckCollision(m_collider.get(), otherCollider);
 	}
 
 	void PhysicsActor::SetPosition(const sf::Vector2f& newPosition)

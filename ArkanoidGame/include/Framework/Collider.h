@@ -13,13 +13,14 @@ namespace Arkanoid
 		sf::Vector2f GetPosition() const { return m_position; }
 		void SetPosition(const sf::Vector2f position) { m_position = position; }
 
-		static bool CheckCollision(const Circle& object, const Rectangle& other);
+		static bool CheckCollision(const Collider* lhs, const Collider* rhs);
 		static bool CheckBoundsCollision(const Circle& object);
 		static bool CheckBoundsCollision(const Rectangle& object);
 		static bool CheckHorizontalBoundsCollision(Collider* const object);
 		static bool CheckVerticalBoundsCollision(Collider* const object);
 
 	private:
+		static bool CheckCircleToRectCollision(const Circle& object, const Rectangle& other);
 		sf::Vector2f m_position;
 	};
 

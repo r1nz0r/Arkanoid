@@ -11,7 +11,6 @@ namespace Arkanoid
 		virtual ~PhysicsActor() = default;
 
 		void Tick(float deltaTime) override;
-		bool CheckCollision(const PhysicsActor* other) const;
 		Collider* GetCollider() const { return m_collider.get(); }
 		virtual void OnCollisionEnter(const Collider& other) = 0;
 		void SetPosition(const sf::Vector2f& newPosition) override;
@@ -20,5 +19,8 @@ namespace Arkanoid
 	protected:
 		virtual void BeginPlay() override;
 		std::unique_ptr<Collider> m_collider;
+		bool CheckCollision(const PhysicsActor* other) const;
+
+	private:
 	};
 }

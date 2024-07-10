@@ -11,7 +11,7 @@ namespace Arkanoid
 		: PhysicsActor(owner, new Circle({0.f, 0.f}, BALL_SIZE))
 		, m_speed(BALL_INITIAL_SPEED)
 		, m_velocity(0.f, 0.f)
-		, m_bounceDirection(0)
+		, m_bounceDirection((uint8_t)BounceDirectionBitMask::None)
 		, m_isAttached(true)
 	{
 		m_shape.reset(new sf::CircleShape(BALL_SIZE, 30u));
@@ -96,7 +96,7 @@ namespace Arkanoid
 		SetVelocity({ 0.5f, -1.0f });
 	}
 
-	bool Ball::CheckBounceDirection(BounceDirectionBitMask flags)
+	bool Ball::CheckBounceDirection(BounceDirectionBitMask flags) const
 	{
 		return m_bounceDirection & static_cast<uint8_t>(flags);
 	}

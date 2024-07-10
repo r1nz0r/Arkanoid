@@ -30,7 +30,7 @@ namespace Arkanoid
 		bool IsAttachedToPaddle() const { return m_isAttached; }
 
 	private:
-		bool CheckBounceDirection(BounceDirectionBitMask flags);
+		bool CheckBounceDirection(BounceDirectionBitMask flags) const;
 		void SetBounceDirection(BounceDirectionBitMask flag);
 		void UpdateBounceDirection();
 		void DoCollisionTests();

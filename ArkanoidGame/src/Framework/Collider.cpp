@@ -61,9 +61,9 @@ namespace Arkanoid
 		return false;
 	}
 
-	bool Collider::CheckHorizontalBoundsCollision(Collider* const object)
+	bool Collider::CheckHorizontalBoundsCollision(const Collider* const object)
 	{
-		Circle* circle = dynamic_cast<Circle*>(object);
+		const Circle* circle = dynamic_cast<const Circle*>(object);
 
 		if (circle)
 		{
@@ -75,7 +75,7 @@ namespace Arkanoid
 				return true;
 		}
 		
-		Rectangle* rect = dynamic_cast<Rectangle*>(object);
+		const Rectangle* rect = dynamic_cast<const Rectangle*>(object);
 
 		if (rect)
 		{
@@ -90,9 +90,9 @@ namespace Arkanoid
 		return false;
 	}
 
-	bool Collider::CheckVerticalBoundsCollision(Collider* const object)
+	bool Collider::CheckVerticalBoundsCollision(const Collider* const object)
 	{
-		Circle* circle = dynamic_cast<Circle*>(object);
+		const Circle* circle = dynamic_cast<const Circle*>(object);
 
 		if (circle)
 		{
@@ -104,7 +104,7 @@ namespace Arkanoid
 				return true;
 		}
 
-		Rectangle* rect = dynamic_cast<Rectangle*>(object);
+		const Rectangle* rect = dynamic_cast<const Rectangle*>(object);
 
 		if (rect)
 		{

@@ -16,8 +16,8 @@ namespace Arkanoid
 		static bool CheckCollision(const Collider* lhs, const Collider* rhs);
 		static bool CheckBoundsCollision(const Circle& object);
 		static bool CheckBoundsCollision(const Rectangle& object);
-		static bool CheckHorizontalBoundsCollision(Collider* const object);
-		static bool CheckVerticalBoundsCollision(Collider* const object);
+		static bool CheckHorizontalBoundsCollision(const Collider* const object);
+		static bool CheckVerticalBoundsCollision(const Collider* const object);
 
 	private:
 		static bool CheckCircleToRectCollision(const Circle& object, const Rectangle& other);

@@ -18,8 +18,7 @@ namespace Arkanoid
 		if (!other)
 			return false;
 
-		auto otherCollider = other->GetCollider();
-				
+		auto otherCollider = other->GetCollider();				
 		return Collider::CheckCollision(m_collider.get(), otherCollider);
 	}
 

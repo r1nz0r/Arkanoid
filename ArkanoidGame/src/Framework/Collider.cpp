@@ -82,12 +82,12 @@ namespace Arkanoid
 		m_collisionType = ECollisionType::None;
 
 		auto position = other.GetPosition();
-		auto halfSize = other.GetSize() / 2.f;
+		auto size = other.GetSize();
 
-		if (position.x + halfSize.x >= SCREEN_WIDTH ||
-			position.x - halfSize.x <= 0)
+		if (position.x + size.x >= SCREEN_WIDTH ||
+			position.x <= 0)
 			m_collisionType = ECollisionType::Horizontal;
-		else if (position.y + halfSize.y >= SCREEN_HEIGHT ||
+		else if (position.y + size.y >= SCREEN_HEIGHT ||
 			position.y <= 0)
 			m_collisionType = ECollisionType::Vertical;
 

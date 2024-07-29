@@ -39,7 +39,7 @@ namespace Arkanoid
 		void OnVerticalBoundsCollision();
 		void OnHorizontalBoundsCollision();
 		float GetPaddleHitNormalizedPoint(const Rectangle& paddle) const;
-		float GetPaddleBounceAngle(const Rectangle& paddle) const;
+		float GetBounceAngleFromPaddle(const Rectangle& paddle) const;
 
 		sf::Vector2f m_velocity;
 		float m_speed;

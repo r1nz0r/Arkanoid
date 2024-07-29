@@ -47,6 +47,7 @@ namespace Arkanoid
 	void Ball::OnCollisionEnter(const ICollidable& other)
 	{
 		std::weak_ptr<Paddle> paddle = static_cast<GameLevel*>(m_owner)->GetPaddle();
+
 		if (!paddle.expired() && other.GetOwner()->GetId() == paddle.lock()->GetId())
 			OnPaddleCollision(static_cast<Rectangle&>(paddle.lock()->GetCollider()));
 		else if (other.GetOwner()->GetId() == GetId())
@@ -62,7 +63,7 @@ namespace Arkanoid
 
 	void Ball::OnPaddleCollision(const Rectangle& other)
 	{
-		const float bounceAngle = GetPaddleBounceAngle(other);
+		const float bounceAngle = GetBounceAngleFromPaddle(other);
 		const float normalizedHitPosition = GetPaddleHitNormalizedPoint(other);
 		m_speed = BALL_INITIAL_SPEED + std::abs(normalizedHitPosition) * BALL_ANGLE_ACCELERATION;
 		m_velocity.x = -std::sin(bounceAngle);
@@ -113,7 +114,7 @@ namespace Arkanoid
 		m_velocity = velocity;
 	}
 
-	float Ball::GetPaddleBounceAngle(const Rectangle& paddle) const
+	float Ball::GetBounceAngleFromPaddle(const Rectangle& paddle) const
 	{
 		const float normalizedHitPositionX = GetPaddleHitNormalizedPoint(paddle);
 		return Math::GetRadiansFromDegrees(normalizedHitPositionX * BOUNCE_ANGLE_MAX);

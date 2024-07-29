@@ -2,8 +2,11 @@
 
 namespace Arkanoid
 {
+	uint64_t Entity::s_UniqueId = 0;
+
 	Entity::Entity()
 		: m_bIsPendingToDestroy(false)
+		, m_Id(GetNextUniqueId())
 	{}
 
 	Entity::~Entity()

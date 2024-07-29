@@ -4,11 +4,12 @@
 #include "Game/Paddle.h"
 #include "Framework/MathUtils.h"
 #include "Framework/Collider.h"
+#include "Framework/PhysicsEngine.h"
 
 namespace Arkanoid
 {
 	Ball::Ball(World* owner)
-		: PhysicsActor(owner, new Circle({0.f, 0.f}, BALL_SIZE))
+		: PhysicsActor(owner, std::unique_ptr<Circle>(new Circle({ 0.f, 0.f }, BALL_SIZE)))
 		, m_speed(BALL_INITIAL_SPEED)
 		, m_velocity(0.f, 0.f)
 		, m_bounceDirection((uint8_t)BounceDirectionBitMask::None)
@@ -24,15 +25,10 @@ namespace Arkanoid
 		if (IsAttachedToPaddle())
 		{
 			if (auto paddle = static_cast<GameLevel*>(m_owner)->GetPaddle().lock())
-				SetPosition(paddle->GetPosition() - sf::Vector2f(0.f, PADDLE_HEIGHT / 2 + BALL_SIZE));
-			
+				SetPosition(paddle->GetPosition() - sf::Vector2f(0.f, PADDLE_HEIGHT));
+
 			return;
 		}
-
-		LOG("Ball position y: %f\tCollider position y: %f", GetPosition().y, m_collider->GetPosition().y);
-
-		DoCollisionTests();
-		UpdateBounceDirection();
 
 		auto moveDistance = m_velocity * m_speed * deltaTime;
 		AddPositionOffset(moveDistance);
@@ -48,6 +44,22 @@ namespace Arkanoid
 		m_bounceDirection &= (int)BounceDirectionBitMask::None;
 	}
 
+	void Ball::OnCollisionEnter(const ICollidable& other)
+	{
+		std::weak_ptr<Paddle> paddle = static_cast<GameLevel*>(m_owner)->GetPaddle();
+		if (!paddle.expired() && other.GetOwner()->GetId() == paddle.lock()->GetId())
+			OnPaddleCollision(static_cast<Rectangle&>(paddle.lock()->GetCollider()));
+		else if (other.GetOwner()->GetId() == GetId())
+		{
+			if (PhysicsWorld::Instance().GetBoundsCollisionType() == BoundsCollider::ECollisionType::Horizontal)
+				OnHorizontalBoundsCollision();
+			else
+				OnVerticalBoundsCollision();
+		}
+
+		UpdateBounceDirection();
+	}
+
 	void Ball::OnPaddleCollision(const Rectangle& other)
 	{
 		const float bounceAngle = GetPaddleBounceAngle(other);
@@ -60,33 +72,6 @@ namespace Arkanoid
 		SetBounceDirection(BounceDirectionBitMask::Up);
 	}
 
-	void Ball::DoCollisionTests()
-	{
-		std::weak_ptr<Paddle> paddle = static_cast<GameLevel*>(m_owner)->GetPaddle();
-
-		if (paddle.expired())
-			return;
-
-		if (CheckCollision(paddle.lock().get()))
-			OnPaddleCollision(*static_cast<Rectangle*>(paddle.lock()->GetCollider()));
-		else
-		{
-			if (Collider::CheckVerticalBoundsCollision(m_collider.get()))
-			{
-				OnVerticalBoundsCollision();
-			}
-			else if (Collider::CheckHorizontalBoundsCollision(m_collider.get()))
-			{
-				OnHorizontalBoundsCollision();
-			}
-		}
-	}
-
-	void Ball::OnCollisionEnter(const Collider& other)
-	{
-		//Empty
-	}
-
 	void Ball::Detach()
 	{
 		if (!m_isAttached)
@@ -94,6 +79,17 @@ namespace Arkanoid
 
 		m_isAttached = false;
 		SetVelocity({ 0.5f, -1.0f });
+	}
+
+	void Ball::SetPosition(const sf::Vector2f& newPosition)
+	{
+		PhysicsActor::SetPosition(newPosition);
+
+		if (!m_collider)
+			return;
+
+		auto shapeBounds = m_shape->getLocalBounds();
+		m_collider->SetPosition(GetPosition());
 	}
 
 	bool Ball::CheckBounceDirection(BounceDirectionBitMask flags) const
@@ -108,7 +104,8 @@ namespace Arkanoid
 
 	void Ball::BeginPlay()
 	{
-		SetPosition({ 400.f, 570.f });
+		PhysicsActor::BeginPlay();
+		SetPosition({ 400.f, 550.f });
 	}
 
 	void Ball::SetVelocity(const sf::Vector2f& velocity)
@@ -141,6 +138,6 @@ namespace Arkanoid
 		if (m_collider->GetPosition().x > SCREEN_HEIGHT / 2.f)
 			SetBounceDirection(BounceDirectionBitMask::Left);
 		else
-			SetBounceDirection(BounceDirectionBitMask::Right);	
+			SetBounceDirection(BounceDirectionBitMask::Right);
 	}
 }

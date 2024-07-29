@@ -25,16 +25,16 @@ namespace Arkanoid
 		~Ball() = default;
 		void Tick(float deltaTime) override;
 		void BeginPlay() override;
-		void SetVelocity(const sf::Vector2f& velocity);	
+		void SetVelocity(const sf::Vector2f& velocity);
 		void Detach();
 		bool IsAttachedToPaddle() const { return m_isAttached; }
+		void SetPosition(const sf::Vector2f& newPosition) override;
 
 	private:
 		bool CheckBounceDirection(BounceDirectionBitMask flags) const;
 		void SetBounceDirection(BounceDirectionBitMask flag);
 		void UpdateBounceDirection();
-		void DoCollisionTests();
-		virtual void OnCollisionEnter(const Collider& other) override;
+		virtual void OnCollisionEnter(const ICollidable& other) override;
 		void OnPaddleCollision(const Rectangle& other);
 		void OnVerticalBoundsCollision();
 		void OnHorizontalBoundsCollision();

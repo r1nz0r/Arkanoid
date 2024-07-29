@@ -1,25 +1,24 @@
 #pragma once
 #include "Framework/Actor.h"
+#include "Framework/Collider.h"
+#include "Framework/ICollidable.h"
 
 namespace Arkanoid
 {
 	class Collider;
-	class PhysicsActor : public Actor
+	class PhysicsActor : public Actor, public ICollidable
 	{
 	public:
-		PhysicsActor(World* owner, Collider* collider = nullptr, const sf::Vector2f& position = { 0.f,0.f }, float rotation = 0.f);
-		virtual ~PhysicsActor() = default;
+		PhysicsActor(World* owner, std::unique_ptr<Collider> collider, const sf::Vector2f& position = { 0.f,0.f }, float rotation = 0.f);
+		virtual ~PhysicsActor();
 
 		void Tick(float deltaTime) override;
-		Collider* GetCollider() const { return m_collider.get(); }
-		virtual void OnCollisionEnter(const Collider& other) = 0;
+		virtual void OnCollisionEnter(const ICollidable& other) override = 0;
 		void SetPosition(const sf::Vector2f& newPosition) override;
 		void AddPositionOffset(const sf::Vector2f& offset) override;
 
 	protected:
 		virtual void BeginPlay() override;
-		std::unique_ptr<Collider> m_collider;
-		bool CheckCollision(const PhysicsActor* other) const;
 
 	private:
 	};

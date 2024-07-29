@@ -19,7 +19,8 @@ namespace Arkanoid
 		void Tick(float deltaTime) override;
 		void BeginPlay() override;
 		void SetVelocity(const sf::Vector2f& velocity);
-		virtual void OnCollisionEnter(const Collider& other) override;
+		virtual void OnCollisionEnter(const ICollidable& other) override;
+		void SetPosition(const sf::Vector2f& newPosition) override;
 
 	private:
 		EMoveDirection m_direction;

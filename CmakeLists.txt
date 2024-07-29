@@ -20,3 +20,4 @@ set(ARKANOID_GAME_TARGET_NAME ArkanoidGame)
 
 # Add game Cmake files
 add_subdirectory(${ARKANOID_GAME_TARGET_NAME})
+

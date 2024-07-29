@@ -5,7 +5,6 @@
 
 namespace Arkanoid
 {
-	class Entity;
 	class World;
 	class Application : private NonCopyable
 	{

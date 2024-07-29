@@ -7,13 +7,13 @@
 namespace Arkanoid
 {
 	Paddle::Paddle(World* owner)
-		: PhysicsActor(owner, new Rectangle({ 0.f, 0.f }, { PADDLE_WIDTH, PADDLE_HEIGHT }))
+		: PhysicsActor(owner, std::unique_ptr<Rectangle>(new Rectangle({ 0.f, 0.f }, { PADDLE_WIDTH, PADDLE_HEIGHT })))
 		, m_direction(EMoveDirection::None)
 		, m_velocity()
 		, m_speed(PADDLE_SPEED)
 		, m_moveInput()
 	{
-		m_shape.reset(new sf::RectangleShape({PADDLE_WIDTH, PADDLE_HEIGHT }));
+		m_shape.reset(new sf::RectangleShape({ PADDLE_WIDTH, PADDLE_HEIGHT }));
 		CenterPivot();
 	}
 
@@ -22,11 +22,11 @@ namespace Arkanoid
 		HandleInput();
 		ConsumeInput(deltaTime);
 		AddPositionOffset(m_velocity * deltaTime);
-		ClampPosition();
 	}
 
 	void Paddle::BeginPlay()
 	{
+		PhysicsActor::BeginPlay();
 		m_shape->setFillColor(sf::Color::Cyan);
 		SetPosition({ 400.f, 580.f });
 	}
@@ -36,11 +36,20 @@ namespace Arkanoid
 		m_velocity = velocity;
 	}
 
-	void Paddle::OnCollisionEnter(const Collider& other)
+	void Paddle::OnCollisionEnter(const ICollidable& other)
 	{
-		//Empty
+		if (other.GetOwner()->GetId() == GetId())
+			ClampPosition();
 	}
-	
+
+	void Paddle::SetPosition(const sf::Vector2f& newPosition)
+	{
+		PhysicsActor::SetPosition(newPosition);
+
+		if (m_collider)
+			m_collider->SetPosition({ GetPosition().x - PADDLE_WIDTH / 2.f, GetPosition().y - PADDLE_HEIGHT / 2.f });
+	}
+
 	void Paddle::HandleInput()
 	{
 		if (sf::Keyboard::isKeyPressed(sf::Keyboard::A))
@@ -48,10 +57,13 @@ namespace Arkanoid
 		else if (sf::Keyboard::isKeyPressed(sf::Keyboard::D))
 			m_moveInput.x = 1.0f;
 
+		//if (sf::Keyboard::isKeyPressed(sf::Keyboard::W))
+		//	m_moveInput.y = -1.0f;
+		//else if (sf::Keyboard::isKeyPressed(sf::Keyboard::S))
+		//	m_moveInput.y= 1.0f;
+
 		Math::GetNormalizedVector(m_moveInput);
 	}
-
-
 
 	void Paddle::ConsumeInput(float deltaTime)
 	{
@@ -62,7 +74,7 @@ namespace Arkanoid
 	void Paddle::ClampPosition()
 	{
 		if (!m_owner)
-			return;	
+			return;
 
 		auto position = GetPosition();
 		auto size = GetGlobalBounds();

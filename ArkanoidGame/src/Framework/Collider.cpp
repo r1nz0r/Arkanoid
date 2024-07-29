@@ -9,141 +9,105 @@ namespace Arkanoid
 		: m_position(position)
 	{}
 
-	bool Collider::CheckCollision(const Collider* lhs, const Collider* rhs)
-	{
-		if (!lhs || !rhs)
-			return false;	
-
-		const Circle* col1 = dynamic_cast<const Circle*>(lhs);
-		const Rectangle* col2 = dynamic_cast<const Rectangle*>(rhs);
-
-		if (col1 && col2)
-			return Collider::CheckCircleToRectCollision(*col1, *col2);
-
-		col1 = dynamic_cast<const Circle*>(lhs);
-		col2 = dynamic_cast<const Rectangle*>(rhs);
-
-		if (col1 && col2)
-			return Collider::CheckCircleToRectCollision(*col1, *col2);
-
-		return false;
-	}
-
-	bool Collider::CheckBoundsCollision(const Circle& object)
-	{
-		auto position = object.GetPosition();
-		auto radius = object.GetRadius();
-
-		if (position.x - radius <= 0 ||
-			position.x + radius >= SCREEN_WIDTH ||
-			position.y - radius <= 0 ||
-			position.y + radius >= SCREEN_HEIGHT)
-		{
-			return true;
-		}
-
-		return false;
-	}
-
-	bool Collider::CheckBoundsCollision(const Rectangle& object)
-	{
-		auto position = object.GetPosition();
-		auto size = object.GetSize();
-
-		if (position.x <= 0 ||
-			position.x + size.x >= SCREEN_WIDTH ||
-			position.y <= 0 ||
-			position.y + size.y >= SCREEN_HEIGHT)
-		{
-			return true;
-		}
-
-		return false;
-	}
-
-	bool Collider::CheckHorizontalBoundsCollision(const Collider* const object)
-	{
-		const Circle* circle = dynamic_cast<const Circle*>(object);
-
-		if (circle)
-		{
-			auto position = circle->GetPosition();
-			auto radius = circle->GetRadius();
-
-			if (position.x + radius >= SCREEN_WIDTH ||
-				position.x - radius <= 0)
-				return true;
-		}
-		
-		const Rectangle* rect = dynamic_cast<const Rectangle*>(object);
-
-		if (rect)
-		{
-			auto position = rect->GetPosition();
-			auto size = rect->GetSize();
-
-			if (position.x + size.x >= SCREEN_WIDTH ||
-				position.x <= 0)
-				return true;
-		}
-
-		return false;
-	}
-
-	bool Collider::CheckVerticalBoundsCollision(const Collider* const object)
-	{
-		const Circle* circle = dynamic_cast<const Circle*>(object);
-
-		if (circle)
-		{
-			auto position = circle->GetPosition();
-			auto radius = circle->GetRadius();
-
-			if (position.y + radius >= SCREEN_HEIGHT ||
-				position.y - radius <= 0)
-				return true;
-		}
-
-		const Rectangle* rect = dynamic_cast<const Rectangle*>(object);
-
-		if (rect)
-		{
-			auto position = rect->GetPosition();
-			auto size = rect->GetSize();
-
-			if (position.y + size.x >= SCREEN_HEIGHT ||
-				position.y <= 0)
-				return true;
-		}
-
-		return false;
-	}
-
-	bool Collider::CheckCircleToRectCollision(const Circle& lhs, const Rectangle& rhs)
-	{
-		auto rhsPosition = rhs.GetPosition();
-		auto lhsPosition = lhs.GetPosition();
-
-		const float rectangleX = std::max(
-			rhsPosition.x, std::min(lhsPosition.x, rhsPosition.x + rhs.GetSize().x));
-		const float dx = lhsPosition.x - rectangleX;
-
-		const float rectangleY = std::max(
-			rhsPosition.y, std::min(lhsPosition.y, rhsPosition.y + rhs.GetSize().y));
-		const float dy = lhsPosition.y - rectangleY;
-
-		return (dx * dx + dy * dy) < (lhs.GetRadius() * lhs.GetRadius());
-	}
-
 	Circle::Circle(const sf::Vector2f& position, float radius)
 		: Collider(position)
 		, m_radius(radius)
+	{}
+
+	bool Circle::CheckCollision(const Collider& other) const
 	{
+		return other.CheckCollision(*this);
+	}
+
+	bool Circle::CheckCollision(const Rectangle& other) const
+	{
+		auto rhsPosition = other.GetPosition();
+		auto lhsPosition = GetPosition();
+
+		const float rectangleX = std::max(
+			rhsPosition.x, std::min(lhsPosition.x, rhsPosition.x + other.GetSize().x));
+		const float dx = lhsPosition.x - rectangleX;
+
+		const float rectangleY = std::max(
+			rhsPosition.y, std::min(lhsPosition.y, rhsPosition.y + other.GetSize().y));
+		const float dy = lhsPosition.y - rectangleY;
+
+		return (dx * dx + dy * dy) < (GetRadius() * GetRadius());
+	}
+
+	bool Circle::CheckCollision(const Circle& other) const
+	{
+		float dx = GetPosition().x - other.GetPosition().x;
+		float dy = GetPosition().y - other.GetPosition().y;
+		float distSumSqr = dx * dx + dy * dy;
+		float radiusSumSqr = (GetRadius() + other.GetRadius()) * (GetRadius() + other.GetRadius());
+
+		return distSumSqr <= radiusSumSqr;
 	}
 
 	Rectangle::Rectangle(const sf::Vector2f& position, const sf::Vector2f& size)
 		: Collider(position)
 		, m_size(size)
+	{}
+
+	bool Rectangle::CheckCollision(const Collider& other) const
 	{
+		return other.CheckCollision(*this);
+	}
+
+	bool Rectangle::CheckCollision(const Rectangle& other) const
+	{
+		sf::FloatRect thisRect(GetPosition(), GetSize());
+		sf::FloatRect otherRect(other.GetPosition(), other.GetSize());
+		return thisRect.intersects(otherRect);
+	}
+
+	bool Rectangle::CheckCollision(const Circle& other) const
+	{
+		return other.CheckCollision(*this);
+	}
+
+	BoundsCollider::BoundsCollider(const sf::Vector2f& position, const sf::Vector2f& size)
+		: Collider()
+		, m_collisionType(ECollisionType::None)
+	{}
+
+	bool BoundsCollider::CheckCollision(const Collider& other) const
+	{
+		return other.CheckCollision(*this);
+	}
+
+	bool BoundsCollider::CheckCollision(const Rectangle& other) const
+	{
+		m_collisionType = ECollisionType::None;
+
+		auto position = other.GetPosition();
+		auto halfSize = other.GetSize() / 2.f;
+
+		if (position.x + halfSize.x >= SCREEN_WIDTH ||
+			position.x - halfSize.x <= 0)
+			m_collisionType = ECollisionType::Horizontal;
+		else if (position.y + halfSize.y >= SCREEN_HEIGHT ||
+			position.y <= 0)
+			m_collisionType = ECollisionType::Vertical;
+
+		return m_collisionType != ECollisionType::None;
+	}
+
+	bool BoundsCollider::CheckCollision(const Circle& other) const
+	{
+		m_collisionType = ECollisionType::None;
+
+		auto position = other.GetPosition();
+		auto radius = other.GetRadius();
+
+		if (position.y + radius >= SCREEN_HEIGHT ||
+			position.y - radius <= 0)
+			m_collisionType = ECollisionType::Vertical;
+		else if (position.x + radius >= SCREEN_WIDTH ||
+			position.x - radius <= 0)
+			m_collisionType = ECollisionType::Horizontal;
+
+		return m_collisionType != ECollisionType::None;
 	}
 }

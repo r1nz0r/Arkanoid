@@ -14,14 +14,19 @@ target_include_directories(${ARKANOID_GAME_TARGET_NAME} PUBLIC
 set(SFML_LIB_NAME SFML)
 
 #Using fetch for download SFML
-include(FetchContent)
-FetchContent_Declare(
-    ${SFML_LIB_NAME}
-    GIT_REPOSITORY https://github.com/SFML/SFML
-    GIT_TAG 2.6.1
-    GIT_SHALLOW FALSE
-)
 
+set(SFML_LIB_VERSION 2.6.1)
+find_package(${SFML_LIB_NAME} ${SFML_LIB_VERSION} QUIET)
+
+if (NOT ${SFML_LIB_NAME}_FOUND)
+    include(FetchContent)
+    FetchContent_Declare(
+        ${SFML_LIB_NAME}
+        GIT_REPOSITORY https://github.com/SFML/SFML
+        GIT_TAG 2.6.1
+        GIT_SHALLOW FALSE
+    )
+endif()
 ## If you want to link SFML statically
 set(SFML_STATIC_LIBRARIES TRUE)
 

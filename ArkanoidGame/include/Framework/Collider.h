@@ -8,27 +8,28 @@ namespace Arkanoid
 	class Collider
 	{
 	public:
-		Collider(const sf::Vector2f& position = {0.f,0.f});
+		Collider(const sf::Vector2f& position = { 0.f,0.f });
 		virtual ~Collider() = default;
 		sf::Vector2f GetPosition() const { return m_position; }
 		void SetPosition(const sf::Vector2f position) { m_position = position; }
 
-		static bool CheckCollision(const Collider* lhs, const Collider* rhs);
-		static bool CheckBoundsCollision(const Circle& object);
-		static bool CheckBoundsCollision(const Rectangle& object);
-		static bool CheckHorizontalBoundsCollision(const Collider* const object);
-		static bool CheckVerticalBoundsCollision(const Collider* const object);
+		virtual bool CheckCollision(const Collider& other) const = 0;
+		virtual bool CheckCollision(const Rectangle& other) const = 0;
+		virtual bool CheckCollision(const Circle& other) const = 0;
 
 	private:
-		static bool CheckCircleToRectCollision(const Circle& object, const Rectangle& other);
 		sf::Vector2f m_position;
 	};
 
 	class Circle : public Collider
 	{
 	public:
-		Circle(const sf::Vector2f& position = {0.f, 0.f}, float radius = 0.f);
+		Circle(const sf::Vector2f& position = { 0.f, 0.f }, float radius = 0.f);
 		float GetRadius() const { return m_radius; }
+
+		virtual bool CheckCollision(const Collider& other) const override;
+		virtual bool CheckCollision(const Rectangle& other) const override;
+		virtual bool CheckCollision(const Circle& other) const override;
 
 	private:
 		float m_radius;
@@ -37,10 +38,35 @@ namespace Arkanoid
 	class Rectangle : public Collider
 	{
 	public:
-		Rectangle(const sf::Vector2f& position = {0.f, 0.f}, const sf::Vector2f& size = {0.f, 0.f});
-		sf::Vector2f GetSize() const { return m_size; }
+		Rectangle(const sf::Vector2f& position = { 0.f, 0.f }, const sf::Vector2f& size = { 0.f, 0.f });
+
+		const sf::Vector2f& GetSize() const { return m_size; }
+		virtual bool CheckCollision(const Collider& other) const override;
+		virtual bool CheckCollision(const Rectangle& other) const override;
+		virtual bool CheckCollision(const Circle& other) const override;
+
+	protected:
+		sf::Vector2f m_size;
+	};
+
+	class BoundsCollider : public Collider
+	{
+	public:
+		enum class ECollisionType
+		{
+			None,
+			Horizontal,
+			Vertical
+		};
+
+		BoundsCollider(const sf::Vector2f& position = { 0.f, 0.f }, const sf::Vector2f& size = { 0.f, 0.f });
+
+		ECollisionType GetCollisionType() const { return m_collisionType; }
+		virtual bool CheckCollision(const Collider& other) const override;
+		virtual bool CheckCollision(const Rectangle& other) const override;
+		virtual bool CheckCollision(const Circle& other) const override;
 
 	private:
-		sf::Vector2f m_size;
+		mutable ECollisionType m_collisionType;
 	};
 }

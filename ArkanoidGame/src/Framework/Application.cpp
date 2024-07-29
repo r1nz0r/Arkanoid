@@ -1,5 +1,6 @@
 #include "Framework/Application.h"
 #include "Framework/Core.h"
+#include "Framework/PhysicsEngine.h"
 #include "Game/GameLevel.h"
 #include "Game/GameSettings.h"
 
@@ -53,6 +54,8 @@ namespace Arkanoid
 	{
 		if (m_world)
 			m_world->TickInternal(deltaTime);
+
+		PhysicsWorld::Instance().FixedUpdate(deltaTime);
 
 		if (m_cleanClock.getElapsedTime().asSeconds() >= m_cleanInterval)
 		{

@@ -10,12 +10,12 @@ namespace Arkanoid
 		, ICollidable(this)
 	{
 		m_collider = std::move(collider);
-		PhysicsWorld::Instance().AddListener(*this);
+		PhysicsEngine::Instance().AddListener(*this);
 	}
 
 	PhysicsActor::~PhysicsActor()
 	{
-		PhysicsWorld::Instance().RemoveListener(*this);
+		PhysicsEngine::Instance().RemoveListener(*this);
 	}
 
 	void PhysicsActor::Tick(float deltaTime)

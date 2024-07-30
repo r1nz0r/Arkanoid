@@ -19,6 +19,7 @@ namespace Arkanoid
 
 	void Paddle::Tick(float deltaTime)
 	{
+		PhysicsActor::Tick(deltaTime);
 		HandleInput();
 		ConsumeInput(deltaTime);
 		AddPositionOffset(m_velocity * deltaTime);

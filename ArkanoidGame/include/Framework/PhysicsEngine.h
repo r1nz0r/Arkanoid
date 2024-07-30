@@ -7,10 +7,10 @@
 
 namespace Arkanoid
 {
-	class PhysicsWorld : private NonCopyable
+	class PhysicsEngine : private NonCopyable
 	{
 	public:
-		static PhysicsWorld& Instance();
+		static PhysicsEngine& Instance();
 		void AddListener(ICollidable& collidable);
 		void RemoveListener(const ICollidable& collidable);
 		void FixedUpdate(float deltaTime);
@@ -18,7 +18,7 @@ namespace Arkanoid
 	private:
 		void CheckCollisions();
 
-		static std::unique_ptr<PhysicsWorld> instance;
+		static std::unique_ptr<PhysicsEngine> instance;
 		static std::unique_ptr<BoundsCollider> boundsChecker;
 		std::vector<ICollidable*> m_collidables;
 	};

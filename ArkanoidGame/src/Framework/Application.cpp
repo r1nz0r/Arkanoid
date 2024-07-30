@@ -43,7 +43,8 @@ namespace Arkanoid
 
 			if (accumulatedTime >= targetDeltaTime)
 			{
-				accumulatedTime -= targetDeltaTime;				
+				accumulatedTime -= targetDeltaTime;		
+				PhysicsEngine::Instance().FixedUpdate(targetDeltaTime);
 				Tick(targetDeltaTime);
 				RenderInternal();
 			}
@@ -53,9 +54,7 @@ namespace Arkanoid
 	void Application::Tick(float deltaTime)
 	{
 		if (m_world)
-			m_world->TickInternal(deltaTime);
-
-		PhysicsWorld::Instance().FixedUpdate(deltaTime);
+			m_world->TickInternal(deltaTime);		
 
 		if (m_cleanClock.getElapsedTime().asSeconds() >= m_cleanInterval)
 		{

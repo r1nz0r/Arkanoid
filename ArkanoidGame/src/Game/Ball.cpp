@@ -2,6 +2,7 @@
 #include "Game/GameSettings.h"
 #include "Game/GameLevel.h"
 #include "Game/Paddle.h"
+#include "Game/Block.h"
 #include "Framework/MathUtils.h"
 #include "Framework/Collider.h"
 #include "Framework/PhysicsEngine.h"
@@ -25,7 +26,7 @@ namespace Arkanoid
 		if (IsAttachedToPaddle())
 		{
 			if (auto paddle = static_cast<GameLevel*>(m_owner)->GetPaddle().lock())
-				SetPosition(paddle->GetPosition() - sf::Vector2f(0.f, PADDLE_HEIGHT));
+				SetPosition(paddle->GetPosition() - sf::Vector2f(0.f, PADDLE_HEIGHT + BALL_SIZE));
 
 			return;
 		}
@@ -52,10 +53,24 @@ namespace Arkanoid
 			OnPaddleCollision(static_cast<Rectangle&>(paddle.lock()->GetCollider()));
 		else if (other.GetOwner()->GetId() == GetId())
 		{
-			if (PhysicsWorld::Instance().GetBoundsCollisionType() == BoundsCollider::ECollisionType::Horizontal)
+			if (PhysicsEngine::Instance().GetBoundsCollisionType() == BoundsCollider::ECollisionType::Horizontal)
 				OnHorizontalBoundsCollision();
 			else
 				OnVerticalBoundsCollision();
+		}
+		else
+		{
+			auto block = dynamic_cast<const Block*>(&other);
+
+			if (block)
+			{
+				auto blockPos = block->GetCollider().GetPosition();
+				auto ballPos = GetPosition();
+				if (GetPosition().x <= blockPos.x || GetPosition().x >= (blockPos.x + BLOCK_WIDTH))
+					SetBounceDirection(BounceDirectionBitMask::Horizontal);
+				if (GetPosition().y <= blockPos.y || GetPosition().y >= (blockPos.y + BLOCK_HEIGHT))
+					SetBounceDirection(BounceDirectionBitMask::Vertical);
+			}
 		}
 
 		UpdateBounceDirection();
@@ -79,7 +94,7 @@ namespace Arkanoid
 			return;
 
 		m_isAttached = false;
-		SetVelocity({ 0.5f, -1.0f });
+		SetVelocity({ 0.f, -1.0f });
 	}
 
 	void Ball::SetPosition(const sf::Vector2f& newPosition)
@@ -106,7 +121,7 @@ namespace Arkanoid
 	void Ball::BeginPlay()
 	{
 		PhysicsActor::BeginPlay();
-		SetPosition({ 400.f, 550.f });
+		m_isAttached = true;
 	}
 
 	void Ball::SetVelocity(const sf::Vector2f& velocity)
@@ -129,9 +144,9 @@ namespace Arkanoid
 	void Ball::OnVerticalBoundsCollision()
 	{
 		if (m_collider->GetPosition().y > SCREEN_HEIGHT / 2.f)
-			SetBounceDirection(BounceDirectionBitMask::Down);
+			m_isAttached = true;
 		else
-			SetBounceDirection(BounceDirectionBitMask::Up);
+			SetBounceDirection(BounceDirectionBitMask::Down);
 	}
 
 	void Ball::OnHorizontalBoundsCollision()

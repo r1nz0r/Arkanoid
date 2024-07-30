@@ -3,13 +3,13 @@
 
 namespace Arkanoid
 {
-	std::unique_ptr<PhysicsWorld> PhysicsWorld::instance { nullptr };
-	std::unique_ptr<BoundsCollider> PhysicsWorld::boundsChecker { nullptr };
+	std::unique_ptr<PhysicsEngine> PhysicsEngine::instance{ nullptr };
+	std::unique_ptr<BoundsCollider> PhysicsEngine::boundsChecker{ nullptr };
 
-	PhysicsWorld& PhysicsWorld::Instance()
+	PhysicsEngine& PhysicsEngine::Instance()
 	{
 		if (!instance)
-			instance = std::make_unique<PhysicsWorld>();
+			instance = std::make_unique<PhysicsEngine>();
 
 		if (!boundsChecker)
 			boundsChecker = std::make_unique<BoundsCollider>();
@@ -17,30 +17,36 @@ namespace Arkanoid
 		return *instance;
 	}
 
-	void PhysicsWorld::AddListener(ICollidable& collidable)
+	void PhysicsEngine::AddListener(ICollidable& collidable)
 	{
 		m_collidables.push_back(&collidable);
 	}
 
-	void PhysicsWorld::RemoveListener(const ICollidable& collidable)
+	void PhysicsEngine::RemoveListener(const ICollidable& collidable)
 	{
 		m_collidables.erase(std::remove(m_collidables.begin(), m_collidables.end(), &collidable), m_collidables.end());
 	}
 
-	void PhysicsWorld::FixedUpdate(float deltaTime)
+	void PhysicsEngine::FixedUpdate(float deltaTime)
 	{
 		CheckCollisions();
 	}
 
-	void PhysicsWorld::CheckCollisions()
+	void PhysicsEngine::CheckCollisions()
 	{
 		for (int i = 0; i < m_collidables.size(); ++i)
 		{
+			if (m_collidables[i]->GetOwner()->IsPendingToDestroy())
+				continue;
+
 			if (m_collidables[i]->GetCollider().CheckCollision(*boundsChecker))
 				m_collidables[i]->OnCollisionEnter(*m_collidables[i]);
 
 			for (int j = i + 1; j < m_collidables.size(); ++j)
 			{
+				if (m_collidables[j]->GetOwner()->IsPendingToDestroy())
+					continue;
+
 				if (m_collidables[i]->GetCollider().CheckCollision(m_collidables[j]->GetCollider()))
 				{
 					m_collidables[i]->OnCollisionEnter(*m_collidables[j]);

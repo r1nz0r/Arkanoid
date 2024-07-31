@@ -26,6 +26,7 @@ namespace Arkanoid
 		void Tick(float deltaTime) override;
 		void BeginPlay() override;
 		void SetVelocity(const sf::Vector2f& velocity);
+		sf::Vector2f GetVelocity() const { return m_velocity; }
 		void Detach();
 		bool IsAttachedToPaddle() const { return m_isAttached; }
 		void SetPosition(const sf::Vector2f& newPosition) override;

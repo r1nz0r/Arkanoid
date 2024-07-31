@@ -66,9 +66,9 @@ namespace Arkanoid
 			{
 				auto blockPos = block->GetCollider().GetPosition();
 				auto ballPos = GetPosition();
-				if (GetPosition().x <= blockPos.x || GetPosition().x >= (blockPos.x + BLOCK_WIDTH))
+				if ((GetPosition().x <= blockPos.x && GetVelocity().x < 0) || (GetPosition().x >= (blockPos.x + BLOCK_WIDTH) && GetVelocity().x > 0))
 					SetBounceDirection(BounceDirectionBitMask::Horizontal);
-				if (GetPosition().y <= blockPos.y || GetPosition().y >= (blockPos.y + BLOCK_HEIGHT))
+				if ((GetPosition().y <= blockPos.y && GetVelocity().y > 0) || (GetPosition().y >= (blockPos.y + BLOCK_HEIGHT) && GetVelocity().y < 0))
 					SetBounceDirection(BounceDirectionBitMask::Vertical);
 			}
 		}

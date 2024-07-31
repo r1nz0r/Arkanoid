@@ -17,28 +17,40 @@ namespace Arkanoid
 		m_paddle = SpawnActor<Paddle>();
 		m_ball = SpawnActor<Ball>();
 
-		for (int i = 0; i < 5; ++i)
+		for (int i = 1; i < 9; ++i)
 		{
 			auto block = SpawnActor<Block>();
-			block.lock()->SetPosition({ 100.f * (float)i, 50.f });
+			block.lock()->SetPosition({ 80.f * (float)i, 50.f });
 		}
 
-		for (int i = 0; i < 4; ++i)
+		for (int i = 2; i < 7; ++i)
 		{
 			auto block = SpawnActor<Block>();
-			block.lock()->SetPosition({ 100.f * (float)i, 150.f });
+			block.lock()->SetPosition({ 80.f * (float)i, 125.f });
 		}
 
-		for (int i = 6; i < 8; ++i)
+		for (int i = 1; i < 9; ++i)
 		{
 			auto block = SpawnActor<Block>();
-			block.lock()->SetPosition({ 100.f * (float)i, 150.f });
+			block.lock()->SetPosition({ 80.f * (float)i, 170.f });
 		}
 
-		for (int i = 1; i < 8; ++i)
+		for (int i = 4; i < 8; ++i)
 		{
 			auto block = SpawnActor<Block>();
-			block.lock()->SetPosition({ 100.f * (float)i, 300.f });
+			block.lock()->SetPosition({ 80.f * (float)i, 240.f });
+		}
+
+		for (int i = 1; i < 9; ++i)
+		{
+			auto block = SpawnActor<Block>();
+			block.lock()->SetPosition({ 80.f * (float)i, 280.f });
+		}
+
+		for (int i = 1; i < 9; ++i)
+		{
+			auto block = SpawnActor<Block>();
+			block.lock()->SetPosition({ 80.f * (float)i, 320.f });
 		}
 	}
 

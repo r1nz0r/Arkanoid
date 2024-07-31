@@ -7,10 +7,10 @@ namespace Arkanoid
 
 	const float PADDLE_WIDTH = 80.f;
 	const float PADDLE_HEIGHT = 10.f;
-	const float PADDLE_SPEED = 450.f;
+	const float PADDLE_SPEED = 550.f;
 
 	const float BALL_SIZE = 8.f;
-	const float BALL_INITIAL_SPEED = 300.f;
+	const float BALL_INITIAL_SPEED = 400.f;
 	const float BALL_ANGLE_ACCELERATION = 200.f;
 	const float BOUNCE_ANGLE_MAX = 40.f;
 
